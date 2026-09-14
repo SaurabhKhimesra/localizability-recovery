@@ -1,0 +1,22 @@
+# colcon workspace output, if the repository is built in place
+build/
+install/
+log/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+.venv/
+
+# editors and OS
+.vscode/
+.idea/
+*.swp
+.DS_Store
+
+# large local outputs: videos are published as release assets, not committed
+*.mkv
+/recordings/
