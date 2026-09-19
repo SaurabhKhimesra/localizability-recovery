@@ -1,0 +1,96 @@
+{
+  "sensor": "gazebo gpu_lidar",
+  "gazebo_version": "8.10.0",
+  "oversample": {
+    "ugv": 6,
+    "drone": 3
+  },
+  "capture": {
+    "ugv": {
+      "poses": 401,
+      "beams": 5760,
+      "worst_beam_direction_error_rad": 2.4503431589582268e-05
+    },
+    "drone": {
+      "poses": 401,
+      "beams": 20160,
+      "worst_beam_direction_error_rad": 3.654614210947638e-06
+    },
+    "rotation_check": {
+      "ugv": {
+        "poses": 20,
+        "beams": 110358,
+        "p99_abs_m": 0.0013878737254756834,
+        "max_abs_m": 0.0035637105108605738,
+        "hit_mismatches": 0
+      },
+      "drone": {
+        "poses": 20,
+        "beams": 401220,
+        "p99_abs_m": 0.0015167457554631889,
+        "max_abs_m": 0.009383477202018042,
+        "hit_mismatches": 0
+      }
+    },
+    "arclength_step_m": 0.5
+  },
+  "calibration_seeds": [
+    100,
+    101,
+    102,
+    103,
+    104,
+    105,
+    106,
+    107,
+    108,
+    109,
+    110,
+    111,
+    112,
+    113,
+    114,
+    115,
+    116,
+    117,
+    118,
+    119
+  ],
+  "calibration_angles_deg": [
+    0.0,
+    5.0,
+    10.0,
+    15.0,
+    20.0,
+    25.0,
+    30.0,
+    35.0,
+    40.0,
+    45.0,
+    50.0,
+    55.0,
+    60.0,
+    65.0,
+    70.0,
+    75.0,
+    80.0,
+    85.0,
+    90.0
+  ],
+  "n_angles": 19,
+  "length_m": 200.0,
+  "scheduler_quantile": 0.9,
+  "failure_quantile": 0.1,
+  "guard_quantile": 0.9,
+  "ratio_threshold": 0.0021087425685472777,
+  "gicp_ratio_floor": 0.0021087425685472777,
+  "min_inliers": 1023.0,
+  "required_fix_interval_m": 1.25,
+  "required_detection_rate": 0.4,
+  "marker_reliable_range_m": 7.0,
+  "scheduler_margin_m": 1.5,
+  "drone_ratio_threshold": 0.00303997335026656,
+  "drone_gicp_ratio_floor": 0.00303997335026656,
+  "n_samples": 151620,
+  "n_drone_samples": 151620
+}
