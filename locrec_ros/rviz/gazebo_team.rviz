@@ -1,0 +1,327 @@
+Panels:
+- Class: rviz_common/Displays
+  Help Height: 0
+  Name: Displays
+  Property Tree Widget:
+    Expanded: null
+    Splitter Ratio: 0.55
+  Tree Height: 420
+- Class: rviz_common/Views
+  Expanded:
+  - /Current View1
+  Name: Views
+  Splitter Ratio: 0.5
+Visualization Manager:
+  Class: ''
+  Displays:
+  - Alpha: 0.5
+    Cell Size: 1
+    Class: rviz_default_plugins/Grid
+    Color: 160; 160; 164
+    Enabled: true
+    Line Style:
+      Line Width: 0.03
+      Value: Lines
+    Name: Grid
+    Normal Cell Count: 0
+    Offset:
+      X: 0
+      Y: 0
+      Z: 0
+    Plane: XY
+    Plane Cell Count: 60
+    Reference Frame: glance/sensor
+    Value: true
+  - Class: rviz_default_plugins/MarkerArray
+    Enabled: true
+    Name: Tunnel plan
+    Namespaces: {}
+    Topic:
+      Depth: 1
+      Durability Policy: Transient Local
+      History Policy: Keep Last
+      Reliability Policy: Reliable
+      Value: /world/outline
+    Value: true
+  - Alpha: 1
+    Autocompute Intensity Bounds: true
+    Class: rviz_default_plugins/PointCloud2
+    Color: 170; 170; 170
+    Color Transformer: FlatColor
+    Decay Time: 0
+    Enabled: true
+    Name: Map (from true poses)
+    Position Transformer: XYZ
+    Selectable: false
+    Size (Pixels): 2
+    Size (m): 0.05
+    Style: Points
+    Topic:
+      Depth: 5
+      Durability Policy: Volatile
+      History Policy: Keep Last
+      Reliability Policy: Reliable
+      Value: /demo/map
+    Use Fixed Frame: true
+    Value: true
+  - Alpha: 1
+    Autocompute Intensity Bounds: true
+    Class: rviz_default_plugins/PointCloud2
+    Color: 255; 255; 255
+    Color Transformer: FlatColor
+    Decay Time: 0
+    Enabled: true
+    Name: Scan ground robot, constrained
+    Position Transformer: XYZ
+    Selectable: false
+    Size (Pixels): 3
+    Size (m): 0.05
+    Style: Points
+    Topic:
+      Depth: 5
+      Durability Policy: Volatile
+      History Policy: Keep Last
+      Reliability Policy: Reliable
+      Value: /demo/scan/ugv/constrained
+    Use Fixed Frame: true
+    Value: true
+  - Alpha: 1
+    Autocompute Intensity Bounds: true
+    Class: rviz_default_plugins/PointCloud2
+    Color: 214; 39; 40
+    Color Transformer: FlatColor
+    Decay Time: 0
+    Enabled: true
+    Name: Scan ground robot, degenerate
+    Position Transformer: XYZ
+    Selectable: false
+    Size (Pixels): 3
+    Size (m): 0.05
+    Style: Points
+    Topic:
+      Depth: 5
+      Durability Policy: Volatile
+      History Policy: Keep Last
+      Reliability Policy: Reliable
+      Value: /demo/scan/ugv/degenerate
+    Use Fixed Frame: true
+    Value: true
+  - Alpha: 1
+    Buffer Length: 1
+    Class: rviz_default_plugins/Path
+    Color: 255; 255; 255
+    Enabled: true
+    Line Style: Lines
+    Line Width: 0.03
+    Name: Ground truth, ground robot
+    Offset:
+      X: 0
+      Y: 0
+      Z: 0.03
+    Pose Style: None
+    Topic:
+      Depth: 2
+      Durability Policy: Volatile
+      History Policy: Keep Last
+      Reliability Policy: Reliable
+      Value: /demo/path/truth_ugv
+    Value: true
+  - Alpha: 1
+    Autocompute Intensity Bounds: true
+    Class: rviz_default_plugins/PointCloud2
+    Color: 255; 255; 255
+    Color Transformer: FlatColor
+    Decay Time: 0
+    Enabled: true
+    Name: Scan drone, constrained
+    Position Transformer: XYZ
+    Selectable: false
+    Size (Pixels): 3
+    Size (m): 0.05
+    Style: Points
+    Topic:
+      Depth: 5
+      Durability Policy: Volatile
+      History Policy: Keep Last
+      Reliability Policy: Reliable
+      Value: /demo/scan/drone/constrained
+    Use Fixed Frame: true
+    Value: true
+  - Alpha: 1
+    Autocompute Intensity Bounds: true
+    Class: rviz_default_plugins/PointCloud2
+    Color: 214; 39; 40
+    Color Transformer: FlatColor
+    Decay Time: 0
+    Enabled: true
+    Name: Scan drone, degenerate
+    Position Transformer: XYZ
+    Selectable: false
+    Size (Pixels): 3
+    Size (m): 0.05
+    Style: Points
+    Topic:
+      Depth: 5
+      Durability Policy: Volatile
+      History Policy: Keep Last
+      Reliability Policy: Reliable
+      Value: /demo/scan/drone/degenerate
+    Use Fixed Frame: true
+    Value: true
+  - Alpha: 1
+    Buffer Length: 1
+    Class: rviz_default_plugins/Path
+    Color: 255; 255; 255
+    Enabled: true
+    Line Style: Lines
+    Line Width: 0.03
+    Name: Ground truth, drone
+    Offset:
+      X: 0
+      Y: 0
+      Z: 0.03
+    Pose Style: None
+    Topic:
+      Depth: 2
+      Durability Policy: Volatile
+      History Policy: Keep Last
+      Reliability Policy: Reliable
+      Value: /demo/path/truth_drone
+    Value: true
+  - Alpha: 1
+    Buffer Length: 1
+    Class: rviz_default_plugins/Path
+    Color: 255; 127; 14
+    Enabled: true
+    Line Style: Lines
+    Line Width: 0.03
+    Name: Estimate, robot, its own strips
+    Offset:
+      X: 0
+      Y: 0
+      Z: 0.06
+    Pose Style: None
+    Topic:
+      Depth: 2
+      Durability Policy: Volatile
+      History Policy: Keep Last
+      Reliability Policy: Reliable
+      Value: /demo/path/markers
+    Value: true
+  - Alpha: 1
+    Buffer Length: 1
+    Class: rviz_default_plugins/Path
+    Color: 31; 119; 180
+    Enabled: true
+    Line Style: Lines
+    Line Width: 0.03
+    Name: Estimate, drone alone
+    Offset:
+      X: 0
+      Y: 0
+      Z: 0.06
+    Pose Style: None
+    Topic:
+      Depth: 2
+      Durability Policy: Volatile
+      History Policy: Keep Last
+      Reliability Policy: Reliable
+      Value: /demo/path/solo
+    Value: true
+  - Alpha: 1
+    Buffer Length: 1
+    Class: rviz_default_plugins/Path
+    Color: 44; 160; 44
+    Enabled: true
+    Line Style: Lines
+    Line Width: 0.03
+    Name: Estimate, drone on the robot's strips
+    Offset:
+      X: 0
+      Y: 0
+      Z: 0.06
+    Pose Style: None
+    Topic:
+      Depth: 2
+      Durability Policy: Volatile
+      History Policy: Keep Last
+      Reliability Policy: Reliable
+      Value: /demo/path/team
+    Value: true
+  - Class: rviz_default_plugins/MarkerArray
+    Enabled: true
+    Name: Poses, strips, status
+    Namespaces:
+      status ugv: false
+      status drone: false
+    Topic:
+      Depth: 10
+      Durability Policy: Volatile
+      History Policy: Keep Last
+      Reliability Policy: Reliable
+      Value: /demo/markers
+    Value: true
+  - Class: rviz_default_plugins/Image
+    Enabled: false
+    Max Value: 1
+    Median window: 5
+    Min Value: 0
+    Name: Viewer render
+    Normalize Range: true
+    Topic:
+      Depth: 2
+      Durability Policy: Volatile
+      History Policy: Keep Last
+      Reliability Policy: Best Effort
+      Value: /demo/image
+    Value: false
+  Enabled: true
+  Global Options:
+    Background Color: 48; 48; 48
+    Fixed Frame: world
+    Frame Rate: 30
+  Name: root
+  Tools:
+  - Class: rviz_default_plugins/Interact
+    Hide Inactive Objects: true
+  - Class: rviz_default_plugins/MoveCamera
+  - Class: rviz_default_plugins/Select
+  - Class: rviz_default_plugins/FocusCamera
+  - Class: rviz_default_plugins/Measure
+    Line color: 128; 128; 0
+  Transformation:
+    Current:
+      Class: rviz_default_plugins/TF
+  Value: true
+  Views:
+    Current:
+      Class: rviz_default_plugins/ThirdPersonFollower
+      Distance: 30
+      Enable Stereo Rendering:
+        Stereo Eye Separation: 0.06
+        Stereo Focal Distance: 1
+        Swap Stereo Eyes: false
+        Value: false
+      Focal Point:
+        X: 0
+        Y: 0
+        Z: 0
+      Focal Shape Fixed Size: true
+      Focal Shape Size: 0.05
+      Invert Z Axis: false
+      Name: Current View
+      Near Clip Distance: 0.01
+      Pitch: 0.75
+      Target Frame: drone/sensor
+      Value: ThirdPersonFollower (rviz_default_plugins)
+      Yaw: 2.35
+    Saved: null
+Window Geometry:
+  Displays:
+    collapsed: false
+  Height: 1040
+  Hide Left Dock: false
+  Hide Right Dock: true
+  Width: 960
+  X: 960
+  Y: 0
