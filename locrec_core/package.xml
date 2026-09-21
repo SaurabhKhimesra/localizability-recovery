@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>locrec_core</name>
+  <version>0.1.0</version>
+  <description>
+    Localizability-aware LiDAR odometry in C++: scan-to-map registration, the degeneracy detector
+    on the registration Hessian, the retroreflective-strip landmark estimator and the marker
+    scheduler. No ROS dependency, so it can be unit tested and reused on its own.
+  </description>
+  <maintainer email="64199670+SaurabhKhimesra@users.noreply.github.com">Saurabh Khimesra</maintainer>
+  <license>MIT</license>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <depend>eigen</depend>
+  <!-- small_gicp has no rosdep key. The build fetches the pinned release, or takes a checkout
+       through -DSMALL_GICP_SOURCE_DIR. See the README. -->
+
+  <test_depend>ament_cmake_gtest</test_depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>
