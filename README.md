@@ -133,9 +133,9 @@ cd src/localizability-recovery
 PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 python -m pytest locrec/test locrec_ros/test
 ```
 
-83 gtest cases over the C++ and 161 pytest cases over the Python.
-[CI](.github/workflows/ci.yml) builds the workspace and runs the C++ and estimator suites on every
-push; the viewer's tests want a display, so they stay local.
+103 gtest cases over the C++ and 161 pytest cases over the Python.
+[CI](.github/workflows/ci.yml) builds the workspace and runs both on every push, and lints the
+Python. The viewer's live-view tests need the running graph, so those stay local.
 
 ## Reproducing the results
 
