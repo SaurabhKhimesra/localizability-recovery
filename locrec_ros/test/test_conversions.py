@@ -1,14 +1,22 @@
-"""Conversion and action tests that run without a ROS graph or a ROS install."""
+"""Conversion tests that run without a ROS graph or a ROS install.
+
+These cover the Python side, which the viewer uses. The estimator's own conversions are
+C++ and are tested in locrec_estimator/test/test_conversions.cpp.
+"""
 import struct
 import sys
 from pathlib import Path
+from types import SimpleNamespace
 
 import numpy as np
 import pytest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from locrec_ros.conversions import pointcloud2_to_xyz  # noqa: E402
-from locrec_ros.detector import DetectorConfig, LocalizabilityDetector  # noqa: E402
+from locrec_ros.conversions import (  # noqa: E402
+    odometry_to_pose,
+    pointcloud2_to_xyz,
+    stamp_to_ns,
+)
 
 
 class _Field:
@@ -106,78 +114,35 @@ def test_max_points_subsamples():
     assert out.shape[0] <= 10
 
 
-# ---- detector and action rule ---------------------------------------------
+# ---- odometry and stamps ---------------------------------------------------
 
 
-def _corridor(n=3000, seed=0):
-    rng = np.random.default_rng(seed)
-    x = rng.uniform(-8.0, 8.0, n)
-    z = rng.uniform(-0.6, 1.8, n)
-    y = np.where(rng.random(n) < 0.5, -1.6, 1.6)
-    walls = np.stack([x, y, z], axis=1)
-    floor = np.stack(
-        [rng.uniform(-8, 8, n), rng.uniform(-1.6, 1.6, n), np.full(n, -0.7)], axis=1
-    )
-    return np.vstack([walls, floor])
+class _Odometry:
+    """Duck-typed nav_msgs/Odometry, for the same reason _Cloud is duck typed."""
+
+    def __init__(self, position, quaternion):
+        self.pose = SimpleNamespace(
+            pose=SimpleNamespace(
+                position=SimpleNamespace(x=position[0], y=position[1], z=position[2]),
+                orientation=SimpleNamespace(
+                    x=quaternion[0], y=quaternion[1], z=quaternion[2], w=quaternion[3]
+                ),
+            )
+        )
 
 
-# the same corridor on every scan is a sensor standing still, so its odometry pose
-# is the identity every time, and that is the true prior rather than a stand-in
-STILL = np.eye(4)
-
-# these tests exercise pairing, ranges and message shapes, none of which depend
-# on where the threshold sits, so any finite value will do
-ANY_THRESHOLD = 2.0e-3
-CAL = dict(ratio_threshold=ANY_THRESHOLD, marker_reliable_range_m=7.0, scheduler_margin_m=1.5)
+def test_odometry_pose_is_read_and_the_quaternion_normalised():
+    half = np.sqrt(0.5)
+    T = odometry_to_pose(_Odometry((1.0, 2.0, 3.0), (0.0, 0.0, 2 * half, 2 * half)))
+    np.testing.assert_allclose(T[:3, 3], (1.0, 2.0, 3.0))
+    np.testing.assert_allclose(np.linalg.det(T[:3, :3]), 1.0, atol=1e-12)
 
 
-
-def test_detector_returns_nothing_until_it_can_register():
-    det = LocalizabilityDetector(DetectorConfig(**CAL))
-    assert det.process(_corridor(), STILL) is None
-
-
-def test_detector_fires_in_a_corridor_and_names_the_weak_direction():
-    det = LocalizabilityDetector(DetectorConfig(marker_reliable_range_m=7.0, scheduler_margin_m=1.5, ratio_threshold=0.05))
-    out = None
-    for _ in range(4):
-        out = det.process(_corridor(), STILL)
-    assert out is not None
-    assert out.is_degenerate
-    assert abs(out.weak_direction[0]) > 0.9, out.weak_direction
-    assert out.n_points > 0
-    assert out.eigenvalues[0] <= out.eigenvalues[2]
+def test_a_zero_quaternion_is_an_error_not_an_identity():
+    """An identity rotation is a plausible prior that is wrong."""
+    with pytest.raises(ValueError):
+        odometry_to_pose(_Odometry((0.0, 0.0, 0.0), (0.0, 0.0, 0.0, 0.0)))
 
 
-def test_ugv_recommends_a_marker_on_the_falling_edge():
-    det = LocalizabilityDetector(DetectorConfig(marker_reliable_range_m=7.0, scheduler_margin_m=1.5, ratio_threshold=0.05, platform="ugv"))
-    actions = [det.process(_corridor(), STILL) for _ in range(4)]
-    actions = [a.action for a in actions if a is not None]
-    assert actions[0] == "drop_marker", actions
-    assert actions[1] == "none", "one edge, one marker, not one per scan"
-
-
-def test_drone_recommends_a_yaw_across_the_weak_direction():
-    det = LocalizabilityDetector(DetectorConfig(marker_reliable_range_m=7.0, scheduler_margin_m=1.5, ratio_threshold=0.05, platform="drone"))
-    out = None
-    for _ in range(4):
-        out = det.process(_corridor(), STILL)
-    assert out.action.startswith("yaw_to:")
-    deg = float(out.action.split(":")[1])
-    # the corridor runs along x, so the useful direction to look is across it
-    assert min(abs(deg - 90.0), abs(deg + 90.0)) < 20.0, deg
-
-
-def test_message_assembly_without_ros():
-    """build_message is imported lazily so this file runs with no ROS installed."""
-    pytest.importorskip("rclpy")
-    from locrec_ros.node import build_message
-
-    det = LocalizabilityDetector(DetectorConfig(marker_reliable_range_m=7.0, scheduler_margin_m=1.5, ratio_threshold=0.05))
-    out = None
-    for _ in range(4):
-        out = det.process(_corridor(), STILL)
-    msg = build_message(None, out)
-    assert len(msg.eigenvalues) == 3
-    assert len(msg.weak_direction) == 3
-    assert msg.n_points == out.n_points
+def test_stamps_compare_exactly_as_nanoseconds():
+    assert stamp_to_ns(SimpleNamespace(sec=3, nanosec=250_000_000)) == 3_250_000_000
