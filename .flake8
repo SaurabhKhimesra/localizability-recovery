@@ -1,0 +1,11 @@
+[flake8]
+max-line-length = 120
+exclude = .git,__pycache__,build,install,log
+
+# E203: flake8 wants no space before a slice colon, which conflicts with the spacing
+# used for arithmetic slices here, e.g. xs[i : i + n].
+extend-ignore = E203
+
+# The experiments are scripts as much as modules: several put the package on sys.path or
+# call matplotlib.use("Agg") before importing pyplot, so their imports cannot all sit at
+# the top. Those lines carry an explicit noqa rather than a blanket exemption.
