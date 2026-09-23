@@ -96,7 +96,7 @@ def estimator(name: str, vehicle: str, thresholds: str, *, use_markers: bool = F
     ]
     if namespace:
         remaps += [(t, f"{namespace}{t}") for t in ("/points", "/odom_prior", "/scan_report")]
-    return Node(package="locrec_ros", executable="localizability_node", name=f"locrec_{name}",
+    return Node(package="locrec_estimator", executable="localizability_node", name=f"locrec_{name}",
                 output="screen", parameters=[params], remappings=remaps)
 
 
