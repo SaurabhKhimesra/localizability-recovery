@@ -275,7 +275,7 @@ def main() -> None:
     started = time.time()
     rows = []
     if args.workers > 1:
-                # workers recycle: a 300 m world per job is not fully released and a long
+        # workers recycle: a 300 m world per job is not fully released and a long
         # sweep otherwise walks into the OOM killer part way through
         with mp.get_context("spawn").Pool(args.workers, maxtasksperchild=4) as pool:
             for i, row in enumerate(pool.imap_unordered(_one, jobs), 1):

@@ -134,7 +134,7 @@ def run(labels, seeds, length, th, workers):
     jobs = [(label, seed, length, th) for label in labels for seed in range(seeds)]
     rows = []
     if workers > 1:
-                # workers recycle: a 300 m world per job is not fully released and a long
+        # workers recycle: a 300 m world per job is not fully released and a long
         # sweep otherwise walks into the OOM killer part way through
         with mp.get_context("spawn").Pool(workers, maxtasksperchild=4) as pool:
             for i, row in enumerate(pool.imap_unordered(one, jobs), 1):
