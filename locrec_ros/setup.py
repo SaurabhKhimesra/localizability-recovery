@@ -26,7 +26,6 @@ setup(
     license="MIT",
     entry_points={
         "console_scripts": [
-            "localizability_node = locrec_ros.node:main",
             "sim_publisher = locrec_ros.sim_publisher:main",
             "demo_viewer = locrec_ros.demo_viewer:main",
             "gz_driver = locrec_ros.gz_driver:main",
