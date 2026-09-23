@@ -29,7 +29,7 @@ jobs:
                          src/localizability-recovery/locrec_estimator \
                          src/localizability-recovery/locrec_msgs
           # no rosdep keys for these two; the C++ build fetches small_gicp itself
-          pip install --break-system-packages mujoco small-gicp
+          pip install --break-system-packages mujoco small-gicp pillow
 
       - name: Build
         shell: bash
@@ -55,7 +55,20 @@ jobs:
           cd src/localizability-recovery
           # the ROS pytest plugins use a hook argument pytest 9 removed, and none of
           # these tests needs them
-          PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 python3 -m pytest locrec/test -q
+          PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 python3 -m pytest \
+            locrec/test locrec_ros/test/test_conversions.py locrec_ros/test/test_render.py -q
 
-# locrec_ros is left out on purpose: the viewer and its renderers want a display and a
-# GPU, which a runner does not have. Its tests run locally, see locrec_ros/README.md.
+  lint:
+    name: flake8
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install flake8
+      - run: flake8
+
+# locrec_ros/test/test_live_view.py is left out: it checks the viewer against the running
+# graph and the rviz layouts, which needs the whole workspace and a simulator. The GPU
+# renderer's cases skip themselves wherever no EGL context can be made, runners included.
