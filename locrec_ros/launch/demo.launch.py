@@ -62,7 +62,7 @@ def gui_env() -> dict:
 
 def estimator(name: str, use_markers: bool) -> Node:
     return Node(
-        package="locrec_ros",
+        package="locrec_estimator",
         executable="localizability_node",
         name=f"locrec_{name}",
         output="screen",
