@@ -11,8 +11,8 @@ setup(
         ("share/" + package_name, ["package.xml"]),
         ("share/" + package_name + "/launch", ["launch/demo.launch.py", "launch/gazebo.launch.py"]),
         ("share/" + package_name + "/rviz", ["rviz/demo.rviz", "rviz/gazebo_ugv.rviz", "rviz/gazebo_drone.rviz",
-                                                     "rviz/gazebo_team.rviz", "rviz/gazebo_ugv_recording.rviz",
-                                                     "rviz/gazebo_team_recording.rviz"]),
+                                             "rviz/gazebo_team.rviz", "rviz/gazebo_ugv_recording.rviz",
+                                             "rviz/gazebo_team_recording.rviz"]),
         ("share/" + package_name + "/config", ["config/gazebo_gui.config", "config/gazebo_gui_half.config"]),
         # screen-recording helpers, run with `ros2 run locrec_ros record_windows.sh ...`
         ("lib/" + package_name, ["scripts/record_windows.sh", "scripts/rqt_plot_waiting.py",

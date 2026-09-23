@@ -761,7 +761,7 @@ class DemoViewer(Node):
 
         # legend, top right, on a plain panel so it reads over the points
         entries = [("ground truth", TRUTH)] + [(self.tracks[t].spec.label, self.tracks[t].spec.color)
-                                              for t in v.spec.tracks]
+                                               for t in v.spec.tracks]
         if v.spec.name == "ugv":
             entries.append(("marker strip", TAB["green"]))
         entries += [("scan", SCAN_OK), ("scan, degenerate", TAB["red"])]

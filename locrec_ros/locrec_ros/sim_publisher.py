@@ -181,7 +181,6 @@ class SimPublisher(Node):
         self.window = None
         return True
 
-
     def on_action(self, msg: String) -> None:
         if msg.data == "drop_marker":
             self._drop_requested = True

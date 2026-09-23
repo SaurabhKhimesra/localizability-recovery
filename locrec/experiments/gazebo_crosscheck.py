@@ -101,8 +101,8 @@ def one_pass(job) -> dict:
     floor = th["gicp_ratio_floor"] if platform == "ugv" else th["drone_gicp_ratio_floor"]
     cfg = RunConfig(seed=seed, platform=platform, world=spec, lidar=lidar,
                     odometry=OdometryConfig(num_threads=1, gicp_ratio_floor=floor,
-                                           correct_strip_bias=bool(correct_bias),
-                                           measure_strip_spread=bool(spread)))
+                                            correct_strip_bias=bool(correct_bias),
+                                            measure_strip_spread=bool(spread)))
     n_steps = gzl.steps_per_scan(cfg.platform_spec)
     world = TunnelSim(seed, spec, lidar).world
     run_dir = pathlib.Path(work) / f"{platform}_{policy_name}_{seed}"
