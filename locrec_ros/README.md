@@ -1,13 +1,12 @@
 # locrec_ros
 
-The ROS 2 layer of the project: nodes, launch files, rviz layouts and the Gazebo driver. It
-publishes localizability and a recommended action from a LiDAR stream, runs the marker estimator
-in the loop, and drives the Gazebo demonstrations. Targets ROS 2 Jazzy.
+The simulation and visualisation layer: the Gazebo driver, the MuJoCo publisher, the viewer, the
+launch files, the rviz layouts and the screen recorder. Targets ROS 2 Jazzy.
 
-The algorithm itself lives in the `locrec` package, which has no ROS dependency, and this package
-adds none to it: everything the node decides lives in `locrec_ros/detector.py`,
-`locrec_ros/prior.py` and `locrec_ros/conversions.py`, none of which imports rclpy, so the logic
-is testable without a graph.
+The estimator itself is not here. It is the C++ node in [`locrec_estimator`](../locrec_estimator),
+built on [`locrec_core`](../locrec_core), and the launch files below start it. This package drives
+it: it produces the scans, the odometry prior and the marker reports it consumes, mounts a strip
+when it asks for one, and draws what comes back.
 
 Built and tested with ROS 2 Jazzy (RoboStack, Python 3.12) and Gazebo Harmonic (gz-sim 8).
 
@@ -38,7 +37,7 @@ ros2 run locrec_ros sim_publisher --ros-args \
 
 # terminal 2. Every calibrated number has one source and no default: the file
 # locrec/experiments/calibrate_thresholds.py writes, installed with the locrec package.
-ros2 run locrec_ros localizability_node --ros-args \
+ros2 run locrec_estimator localizability_node --ros-args \
   -p thresholds_file:=$(ros2 pkg prefix locrec)/share/locrec/results/thresholds.json \
   -p range:=10.0 -p fov:=360.0 -p platform:=ugv
 
@@ -231,7 +230,7 @@ everything, the Gazebo server included; measured, every process of either setup 
 ## Run against a bag
 
 ```bash
-ros2 run locrec_ros localizability_node --ros-args \
+ros2 run locrec_estimator localizability_node --ros-args \
   -p thresholds_file:=$PWD/results/thresholds.json \
   -p range:=10.0 -p fov:=360.0 -p azimuth_beams:=360 -p platform:=ugv
 ros2 bag play your_bag.db3 --remap /your/lidar/topic:=/points /your/odom/topic:=/odom_prior
@@ -312,45 +311,25 @@ What had to be true for it to work, since each of these failed once:
 
 ## Topics
 
-| Direction | Topic | Type |
+The estimator's own topics and every parameter it takes are documented in
+[`locrec_estimator/README.md`](../locrec_estimator/README.md). What this package puts on the graph:
+
+| Topic | Type | From |
 |---|---|---|
-| in | `/points` | `sensor_msgs/PointCloud2` |
-| in, required | `/odom_prior` | `nav_msgs/Odometry`, cumulative, of the LiDAR frame |
-| in, with `use_markers` or a `gaze` policy | `/scan_report` | `locrec_msgs/ScanReport`, one per scan, stamped like the scan: markers mounted and seen, and the track heading |
-| out | `/localizability` | `locrec_msgs/Localizability` |
-| out | `/localizability/recommended_action` | `std_msgs/String` |
-| out | `/localizability/estimate` | `nav_msgs/Odometry`, the estimate for each scan, stamped like the scan |
-| out, with `share_landmarks` | `/team/landmarks` | `locrec_msgs/SharedLandmark`, one per strip mounted: slot, position, the 2x2 that placed it, the face normal. Reliable, transient local, keep all, so a receiver that joins late still gets every one |
-| in, with `use_shared_landmarks` | `/team/landmarks` | the same, from a teammate. Registered when it arrives, long before the strip comes into view; a repeat of a slot already held is dropped rather than re-registered |
+| `/points` | `sensor_msgs/PointCloud2` | `sim_publisher`, `gz_driver` |
+| `/odom_prior` | `nav_msgs/Odometry`, cumulative, of the LiDAR frame | `sim_publisher`, `gz_driver` |
+| `/scan_report` | `locrec_msgs/ScanReport`, one per scan, stamped like the scan | `sim_publisher`, `gz_driver`: markers mounted and seen, and the track heading |
+| `/world/outline` | `visualization_msgs/MarkerArray`, latched | the tunnel's plan |
+| `/tf` | the true pose, so rviz has a frame to draw in | |
+| `/demo/image`, `/demo/...` | the rendering and what rviz draws | `demo_viewer` |
+| `/demo/error/<estimator>` | `std_msgs/Float64`, \|along-track error\|, m | `demo_viewer`, for live plotting |
+| `/demo/frame_gap/<solo\|team>` | `std_msgs/Float64`, the drone's distance from the robot's frame at the same place, m | `demo_viewer`, with `vehicle:=team` |
 
-`recommended_action` is one of `none`, `drop_marker`, `yaw_to:<deg>`.
+The scores are computed against ground truth, which only the viewer has. No estimator subscribes
+to them.
 
-`sim_publisher` and `gz_driver` also publish `/scan_report` (every scan, with `drop_markers`
-mounting a marker whenever the action topic says `drop_marker`) and the tunnel's plan on
-`/world/outline`, latched. `demo_viewer` publishes its rendering on `/demo/image` and what
-rviz draws under `/demo/`, and the scores it computes against ground truth as `std_msgs/Float64`
-for live plotting: `/demo/error/<estimator>` (|along-track error|, m) and, with `vehicle:=team`,
-`/demo/frame_gap/<solo|team>` (the drone's distance from the robot's frame at the same place, m).
-No estimator subscribes to them.
-
-## Parameters
-
-| Name | Default | Meaning |
-|---|---|---|
-| `thresholds_file` | empty | Path to `locrec/results/thresholds.json`, written by `locrec/experiments/calibrate_thresholds.py`. Every calibrated value below that is not given explicitly is read from it. |
-| `ratio_threshold` | **required, no default** | Below this the scan is called degenerate. The node refuses to start without it, from the file or explicitly, and an explicit value wins. There is deliberately nothing to copy: the value depends on the sensor and the space, so a shipped default would be a number that looks calibrated and is not. From the file: `ratio_threshold` for a 360 degree scanner, `drone_ratio_threshold` for the drone. |
-| `marker_reliable_range`, `scheduler_margin` | **required for the UGV, no default** | The two numbers the marker scheduler spaces by, `marker_reliable_range_m` and `scheduler_margin_m` in the file. The rule is `locrec.policies.LocalizabilityScheduler` itself. |
-| `use_markers` | false | Hold each scan for the `/scan_report` with its stamp, register the markers it says were mounted, and correct the estimate with the ones it saw. |
-| `gaze` | `across` | Drone only. `across` looks across the weak direction whenever the scan is degenerate. `forward` and `glance` are the study's `ForwardGaze` and `GlanceGaze` (`locrec.gaze`), fed what `run_pass` feeds them; they need the track heading from `/scan_report` and `start_at_odometry`. |
-| `registration_threads` | 4 | Threads small_gicp registers with. The result of a long run depends on it, not only the speed: the study's grids and `gazebo.launch.py` use 1 (`docs/failures.md` number 30). |
-| `start_at_odometry` | false | Start the estimate at the first scan's `/odom_prior` pose instead of the identity, which is where `run_pass` starts it when the odometry frame is the world frame at the start, as `gz_driver`'s is. |
-| `min_lambda_per_point` | 0.0 | Absolute guard for the degenerate-but-tiny-scan case. |
-| `range` | 10.0 | Sensor max range, metres. With `fov` and `azimuth_beams` it sets the registration range, by the rule the thresholds were calibrated with (`default_registration_range` in `locrec.runner`). |
-| `fov` | 360.0 | Horizontal field of view, degrees. |
-| `azimuth_beams` | 360 | Horizontal beams across `fov`: 360 for a VLP-16 class scanner, 180 for the drone's 90 degree scanner. Overstating it registers past the range where the scan samples the map finely enough, `docs/failures.md` number 2. |
-| `elevation_beams`, `fov_elevation` | 16, 30.0 | Vertical beams and opening, degrees: 112 over 60 for the drone. They reach the marker measurement model and what a gaze policy thinks a yaw would see. |
-| `platform` | `ugv` | `ugv` recommends markers, `drone` recommends a yaw. |
-| `max_points` | 60000 | Subsample above this, to bound per-scan cost. |
+A driver mounts a marker whenever `/localizability/recommended_action` says `drop_marker`, which
+is how the loop closes.
 
 ## Tests
 
@@ -358,35 +337,16 @@ No estimator subscribes to them.
 PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 python -m pytest locrec_ros/test -q
 ```
 
-They cover the wire-format conversion (extra fields packed after xyz, row
-padding, big endian, float64 fields, non-finite returns, truncated data, a
-missing field) and the action rule for both platforms. `test_prior.py` covers the
-two things the node once got wrong: a scan without a prior is refused, the prior
-is paired by stamp (either arrival order, interpolated, never extrapolated, with a
-bounded wait), and the registration range is the calibrated rule for both study
-sensors. The message-assembly test skips itself when rclpy is absent.
+They cover the wire-format conversion the viewer uses (extra fields packed after xyz, row padding,
+big endian, float64 fields, non-finite returns, truncated data, a missing field, a zero
+quaternion), the renderers, and the viewer's own bookkeeping. The estimator's tests are C++ and
+live in `locrec_estimator/test`.
 
 `PYTEST_DISABLE_PLUGIN_AUTOLOAD=1` because with pytest 9 the ROS pytest plugins
 (`launch_testing`, `launch_testing_ros`) use a hook argument pytest 9 removed and stop the run
 before collection; none of these tests needs them.
 
-## The one thing to get right when you port this
+## Calibrating for a new sensor
 
-`ratio_threshold` is not portable. The ratio depends on the sensor's field of
-view, its range and the size of the space, so a number calibrated on a 10 m
-360 degree scanner in a 3.2 m tunnel means nothing on a 30 m 90 degree scanner or
-in a 6 m drive. Run the sensor down a stretch you know is featureless, collect the
-ratio, and take a high quantile of that distribution. The procedure is in
-`locrec/experiments/calibrate_thresholds.py`.
-
-That is why the parameter is required rather than defaulted. It used to ship 1.9e-3,
-which was transcribed from a calibration run and then went stale when the calibration
-changed, leaving two places claiming different numbers. One constant copied by eye
-into a second place is `docs/failures.md` number 20, the bug this package already had
-once.
-
-Collect that distribution at more than one orientation of the corridor against your
-map's voxel axes. The ratio in a featureless space is periodic in that angle over
-90 degrees and moved by 19 percent across it here, and calibrating at a single
-orientation produced a threshold that could only ever under-fire. `docs/failures.md`
-number 21.
+`ratio_threshold` is not portable, and neither is anything else calibrated. That note, and the
+procedure, are in [`locrec_estimator/README.md`](../locrec_estimator/README.md).
