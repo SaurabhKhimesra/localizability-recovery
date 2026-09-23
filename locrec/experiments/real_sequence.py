@@ -27,12 +27,12 @@ import sys
 import matplotlib
 
 matplotlib.use("Agg")
-import matplotlib.pyplot as plt
-import numpy as np
+import matplotlib.pyplot as plt  # noqa: E402
+import numpy as np  # noqa: E402
 
-from locrec.localizability import analyse_hessian  # noqa: F401  (re-exported for clarity)
-from locrec.odometry import Odometry, OdometryConfig
-from locrec.se3 import inv_T, make_T
+from locrec.localizability import analyse_hessian  # noqa: F401, E402  (re-exported for clarity)
+from locrec.odometry import Odometry, OdometryConfig  # noqa: E402
+from locrec.se3 import inv_T, make_T  # noqa: E402
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 

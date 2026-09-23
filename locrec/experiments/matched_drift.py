@@ -16,7 +16,8 @@ import sys
 import pathlib
 import numpy as np
 sys.path.insert(0, 'experiments')
-from collections import defaultdict
+from collections import defaultdict  # noqa: E402
+
 
 def summarise(path):
     rows = list(csv.DictReader(open(path)))
@@ -30,6 +31,7 @@ def summarise(path):
             float(np.median([float(r["final_along_m"]) for r in sub])),
         )
     return out
+
 
 def matched(out):
     uni = sorted(
@@ -46,6 +48,7 @@ def matched(out):
         need = float(np.interp(drift, ys[order], xs[order]))
         res[k] = (mk, drift, need, need - mk)
     return uni, res
+
 
 for world, path in (("blind", "results/milestone2b_blind.csv"), ("mixed", "results/milestone2b_mixed.csv")):
     if not pathlib.Path(path).exists():

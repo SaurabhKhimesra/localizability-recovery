@@ -12,8 +12,8 @@ from collections import defaultdict
 import matplotlib
 
 matplotlib.use("Agg")
-import matplotlib.pyplot as plt
-import numpy as np
+import matplotlib.pyplot as plt  # noqa: E402
+import numpy as np  # noqa: E402
 
 from marker_drop import bootstrap_ci  # noqa: E402
 

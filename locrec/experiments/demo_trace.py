@@ -15,11 +15,11 @@ import time
 import matplotlib
 
 matplotlib.use("Agg")
-import matplotlib.pyplot as plt
-import numpy as np
+import matplotlib.pyplot as plt  # noqa: E402
+import numpy as np  # noqa: E402
 
-from locrec import RunConfig, WorldSpec, build_world, run_pass
-from locrec.runner import write_csv
+from locrec import RunConfig, WorldSpec, build_world, run_pass  # noqa: E402
+from locrec.runner import write_csv  # noqa: E402
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 PLATFORM_COLOR = {"ugv": "#1f6feb", "drone": "#d1610a"}

@@ -22,8 +22,8 @@ from collections import defaultdict
 import matplotlib
 
 matplotlib.use("Agg")
-import matplotlib.pyplot as plt
-import numpy as np
+import matplotlib.pyplot as plt  # noqa: E402
+import numpy as np  # noqa: E402
 
 INK = "#1c1c1a"
 MUTED = "#6b6b66"
