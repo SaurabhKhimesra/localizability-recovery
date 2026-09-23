@@ -20,6 +20,8 @@
   <exec_depend>tf2_ros_py</exec_depend>
   <exec_depend>locrec</exec_depend>
   <exec_depend>locrec_msgs</exec_depend>
+  <!-- the launch files here start the C++ estimator node -->
+  <exec_depend>locrec_estimator</exec_depend>
   <exec_depend>python3-numpy</exec_depend>
   <exec_depend>python3-scipy</exec_depend>
 
