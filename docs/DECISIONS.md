@@ -334,7 +334,7 @@ reproducible from this commit.** The Monte Carlo grids, the marker counts and th
 drift numbers all gate on it, and redoing them is its own milestone. This commit
 changes the calibration and nothing downstream of it, deliberately, so the threshold
 change can be argued with on its own. The transcribed values in
-`locrec_ros/detector.py` and `locrec_ros/README.md` were downstream in the same sense
+the ROS detector and its README were downstream in the same sense
 and were left alone, which meant they disagreed with `locrec/results/thresholds.json`. That
 is now fixed rather than deferred: `ratio_threshold` is required and has no default,
 the node refuses to start without it with a message naming the file to read, and the
@@ -623,3 +623,19 @@ first. Numbers in `locrec/results/team_pass_gazebo.csv`, which is the reference 
 `locrec/results/team_pass.csv` for the MuJoCo cross-check: in the robot's frame, median 1.85 m solo
 against 0.05 m team on Gazebo and 1.35 m against 0.04 m on MuJoCo, better on 8 of 8 seeds in
 both.
+
+## The runtime is C++, the study is Python
+
+The estimator has to keep up with a LiDAR stream, so it is C++: `locrec_core` is the algorithm on
+Eigen and small_gicp with no ROS dependency, and `locrec_estimator` is the rclcpp node that carries
+it. Keeping the core free of ROS is what lets it be unit tested and reused without a graph, and
+keeping the node thin is what keeps the decisions in one place, the detector, where the tests can
+reach them.
+
+The procedural worlds, the Gazebo driver, the viewer and the offline study stay in Python. That is
+where the work is generating geometry, drawing, and running one process per seed across grids, and
+none of it sits on the path from a scan to a pose.
+
+small_gicp has no rosdep key, so `locrec_core` fetches the pinned release at configure time and
+compiles the two translation units it needs straight into the library. Nothing extra has to be
+installed at runtime, and `-DSMALL_GICP_SOURCE_DIR` takes a local checkout for an offline build.
