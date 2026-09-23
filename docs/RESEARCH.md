@@ -518,6 +518,7 @@ from the repository root against the installed `locrec` package, with no ROS gra
 
 ```bash
 PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 python -m pytest locrec/test locrec_ros/test
+colcon test --packages-select locrec_core locrec_estimator   # the C++ runtime
 
 python locrec/experiments/calibrate_thresholds.py --seeds 4      # seeds 100 to 119
 python locrec/experiments/monte_carlo.py --platform ugv   --world all --seeds 50 --workers 8
@@ -557,10 +558,12 @@ python locrec/experiments/gazebo_crosscheck.py --platform ugv --seeds 8 --jobs 2
 python locrec/experiments/gazebo_crosscheck.py --platform drone --seeds 8 --jobs 2
 ```
 
-The ROS 2 side is `locrec_ros`: a node that subscribes to a point cloud and publishes the
-localizability ratio, eigenvalues, weak direction and recommended action, with the messages in
-`locrec_msgs`, a Gazebo driver, and the launch files for the live demonstrations.
-`locrec_ros/README.md` has the nodes, topics, parameters and what has been verified.
+The ROS 2 side is two packages. `locrec_estimator` is the C++ node: it subscribes to a point
+cloud and an odometry prior and publishes the localizability ratio, eigenvalues, weak direction,
+recommended action and its own estimate, with the messages in `locrec_msgs`. `locrec_ros` is the
+Python simulation and visualisation layer around it: the Gazebo driver, the MuJoCo publisher, the
+viewer and the launch files. Each has a README with its topics, parameters and what has been
+verified.
 
 ## Design decisions worth arguing with
 
