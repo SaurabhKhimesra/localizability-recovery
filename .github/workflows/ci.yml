@@ -1,0 +1,61 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build-and-test:
+    name: colcon build and test (ROS 2 Jazzy)
+    runs-on: ubuntu-latest
+    container: ros:jazzy-ros-base
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: src/localizability-recovery
+
+      - name: Install dependencies
+        run: |
+          apt-get update
+          apt-get install -y --no-install-recommends \
+            git python3-colcon-common-extensions python3-pip
+          rosdep update --rosdistro jazzy
+          rosdep install -y --ignore-src \
+            --from-paths src/localizability-recovery/locrec \
+                         src/localizability-recovery/locrec_core \
+                         src/localizability-recovery/locrec_estimator \
+                         src/localizability-recovery/locrec_msgs
+          # no rosdep keys for these two; the C++ build fetches small_gicp itself
+          pip install --break-system-packages mujoco small-gicp
+
+      - name: Build
+        shell: bash
+        run: |
+          source /opt/ros/jazzy/setup.bash
+          # Eigen leaves a default-constructed matrix uninitialised; filling it with NaN here makes
+          # any read before write fail the tests instead of passing on whatever was in memory
+          colcon build --packages-select locrec locrec_msgs locrec_core locrec_estimator \
+            --cmake-args -DCMAKE_CXX_FLAGS=-DEIGEN_INITIALIZE_MATRICES_BY_NAN
+
+      - name: C++ tests
+        shell: bash
+        run: |
+          source install/setup.bash
+          colcon test --packages-select locrec_core locrec_estimator \
+            --event-handlers console_direct+
+          colcon test-result --all --verbose
+
+      - name: Python tests
+        shell: bash
+        run: |
+          source install/setup.bash
+          cd src/localizability-recovery
+          # the ROS pytest plugins use a hook argument pytest 9 removed, and none of
+          # these tests needs them
+          PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 python3 -m pytest locrec/test -q
+
+# locrec_ros is left out on purpose: the viewer and its renderers want a display and a
+# GPU, which a runner does not have. Its tests run locally, see locrec_ros/README.md.
