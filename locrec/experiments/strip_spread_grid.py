@@ -80,7 +80,8 @@ def main() -> None:
         by = {(r["policy"], r["seed"]): r["final_along_m"] for r in rows if r["measure_strip_spread"] == spread}
         d = [by[("none", s)] - by[("scheduler", s)] for s in range(args.seeds)]
         med, lo, hi = bootstrap_ci(d)
-        print(f"measure_strip_spread={spread}: median none {np.median([by[('none', s)] for s in range(args.seeds)]):.2f} m, "
+        none_median = np.median([by[("none", s)] for s in range(args.seeds)])
+        print(f"measure_strip_spread={spread}: median none {none_median:.2f} m, "
               f"scheduler {np.median([by[('scheduler', s)] for s in range(args.seeds)]):.2f} m; paired {med:+.2f} m "
               f"[{lo:+.2f}, {hi:+.2f}]; worse with markers on seeds {[s for s in range(args.seeds) if d[s] < 0]}")
         print("   per seed (none, scheduler):",

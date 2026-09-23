@@ -151,13 +151,15 @@ class Vehicle:
 
     def track_pose(self) -> np.ndarray:
         """Where the vehicle is, facing the way it travels."""
-        yaw = self.plat.track_yaw() if isinstance(self.plat, Drone) else float(np.arctan2(self.T_true[1, 0], self.T_true[0, 0]))
+        yaw = (self.plat.track_yaw() if isinstance(self.plat, Drone)
+               else float(np.arctan2(self.T_true[1, 0], self.T_true[0, 0])))
         return make_T(euler_zyx(yaw), self.T_true[:3, 3])
 
     def anchor_sdf(self) -> str:
         pose = self.sim.gazebo_pose(self.T_track)
         yaw = float(np.arctan2(pose[1, 0], pose[0, 0]))
-        return (f'<model name="{self.anchor}"><pose>{pose[0, 3]:.6g} {pose[1, 3]:.6g} {pose[2, 3]:.6g} 0 0 {yaw:.6g}</pose>'
+        return (f'<model name="{self.anchor}">'
+                f'<pose>{pose[0, 3]:.6g} {pose[1, 3]:.6g} {pose[2, 3]:.6g} 0 0 {yaw:.6g}</pose>'
                 '<link name="base"><gravity>false</gravity><inertial><mass>1.0</mass>'
                 '<inertia><ixx>0.1</ixx><iyy>0.1</iyy><izz>0.1</izz></inertia></inertial></link></model>')
 

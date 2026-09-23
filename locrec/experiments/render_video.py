@@ -185,7 +185,8 @@ def render(platform: str, seed: int, seconds: float, fps: int, out_dir: pathlib.
                 localizability=step_out.localizability, detections=det,
                 registration=step_out, markers_placed=sim.n_markers_placed,
                 markers_remaining=sim.marker_capacity - sim.n_markers_placed,
-                estimated_distance=float(np.sum(np.linalg.norm(np.diff(np.array(est_xy or [[0, 0]]), axis=0), axis=1))) if len(est_xy) > 1 else 0.0,
+                estimated_distance=float(np.sum(np.linalg.norm(
+                    np.diff(np.array(est_xy or [[0, 0]]), axis=0), axis=1))) if len(est_xy) > 1 else 0.0,
                 local_map_points=odom.map.points if getattr(policy, "needs_map", False) else None,
                 local_map_normals=compute_normals(odom.map.points) if getattr(policy, "needs_map", False) else None,
                 path_length=plat.s,

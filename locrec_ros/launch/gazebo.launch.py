@@ -212,7 +212,8 @@ def generate_launch_description() -> LaunchDescription:
     return LaunchDescription([
         DeclareLaunchArgument("vehicle", default_value="ugv", description="ugv, drone or team"),
         DeclareLaunchArgument("world", default_value="",
-                              description="blind, mixed or junction; mixed for the ugv and junction for the drone when empty"),
+                              description="blind, mixed or junction; mixed for the ugv and "
+                                          "junction for the drone when empty"),
         DeclareLaunchArgument("seed", default_value="1"),
         DeclareLaunchArgument("length", default_value="300.0"),
         DeclareLaunchArgument("rate_hz", default_value="4.0"),
@@ -226,7 +227,8 @@ def generate_launch_description() -> LaunchDescription:
         DeclareLaunchArgument("snapshot_dir", default_value=""),
         DeclareLaunchArgument("playback_speed", default_value="2.75"),
         DeclareLaunchArgument("rviz_config", default_value="",
-                              description="rviz layout; empty for gazebo_<vehicle>.rviz, gazebo_ugv_recording.rviz for a recording"),
+                              description="rviz layout; empty for gazebo_<vehicle>.rviz, "
+                                          "gazebo_ugv_recording.rviz for a recording"),
         DeclareLaunchArgument("gazebo_gui_config", default_value="gazebo_gui.config",
                               description="the Gazebo window's layout; gazebo_gui_half.config for a recording"),
         DeclareLaunchArgument("team_lag", default_value="60",

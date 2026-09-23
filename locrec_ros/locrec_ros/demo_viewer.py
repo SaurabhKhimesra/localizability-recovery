@@ -767,7 +767,8 @@ class DemoViewer(Node):
         entries += [("scan", SCAN_OK), ("scan, degenerate", TAB["red"])]
         width = 44 + max(d.textlength(label, font=f["small"]) for label, _ in entries) + 24
         lx, ly = VIEW_W - width - 16, 16
-        d.rectangle([lx, ly, lx + width, ly + 14 + 26 * len(entries)], fill=(40, 40, 40, 235), outline=(90, 90, 90, 255))
+        d.rectangle([lx, ly, lx + width, ly + 14 + 26 * len(entries)],
+                    fill=(40, 40, 40, 235), outline=(90, 90, 90, 255))
         ly += 8
         for label, color in entries:
             d.line([(lx + 12, ly + 11), (lx + 46, ly + 11)], fill=rgb8(color) + (255,), width=4)
@@ -1031,7 +1032,8 @@ class DemoViewer(Node):
                 ["worst |error|"] + [cell(stats[t]["max"]) for t in self.tracks],
                 ["final |error|"] + [cell(stats[t]["final"]) for t in self.tracks]]
         n_deg = {t: sum(1 for r in self.history if r.get(f"degenerate_{t}")) for t in self.tracks}
-        rows.append(["degenerate scans"] + [f"{100.0 * n_deg[t] / max(len(self.history), 1):.0f} %" for t in self.tracks])
+        rows.append(["degenerate scans"]
+                    + [f"{100.0 * n_deg[t] / max(len(self.history), 1):.0f} %" for t in self.tracks])
         if self.mode == "ugv":
             rows.append(["markers mounted", "0", f"{len(self.marker_stamp)}"])
             rows.append(["scans with a marker fix", "0", f"{sum(1 for r in self.history if r.get('fix_markers'))}"])
@@ -1052,7 +1054,8 @@ class DemoViewer(Node):
                            for t in self.tracks])
         else:
             yaw = {v: np.array([abs(r[f"yaw_offset_{v}"]) for r in self.history]) for v in self.vehicles}
-            rows.append(["sensor > 45\u00b0 off track"] + [f"{100.0 * np.mean(yaw[v] > 45.0):.0f} %" for v in self.vehicles])
+            rows.append(["sensor > 45\u00b0 off track"]
+                        + [f"{100.0 * np.mean(yaw[v] > 45.0):.0f} %" for v in self.vehicles])
         # one width per column, however many estimators there are: the team has three
         label_w = 0.40 if len(cols) < 3 else 0.34
         table = tab.table(cellText=rows, colLabels=[""] + cols, loc="upper left", cellLoc="center",

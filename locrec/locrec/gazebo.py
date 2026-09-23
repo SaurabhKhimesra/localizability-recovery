@@ -51,7 +51,8 @@ from .worlds import TunnelWorld, WorldSpec
 
 __all__ = [
     "LIDAR_SEES", "HIDDEN_FROM_LIDAR", "MARKER_RETRO", "STEP_SIZE",
-    "ShellBox", "shell_boxes", "box_mesh_obj", "MESH_GROUPS", "horizontal_samples", "lidar_sensor", "vehicle_model", "marker_model", "world_sdf",
+    "ShellBox", "shell_boxes", "box_mesh_obj", "MESH_GROUPS", "horizontal_samples",
+    "lidar_sensor", "vehicle_model", "marker_model", "world_sdf",
     "side_by_side_offset", "steps_per_scan",
     "GazeboServer", "GazeboLink", "LidarFrame", "GazeboScan", "GazeboTunnelSim",
 ]
