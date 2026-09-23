@@ -226,13 +226,13 @@ degenerate scans in 596** on a 300 m mixed run, so not one `drop_marker`, and
 nothing logged an error. Two faults in the wrapper, neither of them enough on its
 own to hide the signal.
 
-`node.py` subscribed to `/odom_prior`, stored it, and then called the detector
+The node subscribed to `/odom_prior`, stored it, and then called the detector
 without it, so every scan was registered as though the sensor had not moved since
 the last one. The map is built from the estimate, so the estimate stops following
 the robot and the map fills with scans laid down in the wrong place: **28 m of
 estimated travel over a 300 m run**.
 
-`detector.py` set its own registration range to a fixed 0.85 of the sensor range,
+The detector set its own registration range to a fixed 0.85 of the sensor range,
 8.5 m for the UGV, where `run_pass` also caps it where the beam spacing reaches
 half a voxel, at 5.73 m. That is number 2 above, reintroduced in the wrapper, and
 the `fov` parameter the cap needs was accepted and never read.
@@ -252,9 +252,10 @@ percent, which is the whole point: the threshold describes a ratio produced by o
 particular registration, and a wrapper that configures that registration
 differently is not measuring the same quantity. Through the graph after both
 fixes, the same run gives a blind median of 1.75e-3 and **39 markers, none of them
-on structure**. Both faults are pinned in `locrec_ros/test/test_prior.py`, and
-the range rule now has one definition, `locrec.runner.default_registration_range`,
-which `run_pass` and the detector both call.
+on structure**. Both faults are pinned in the estimator's tests
+(`locrec_estimator/test/test_prior_pairer.cpp` and `test_detector.cpp`), and the range rule has
+one definition per implementation, `locrec.runner.default_registration_range` offline and
+`locrec_estimator::defaultRegistrationRange` in the node, which the tests hold to the same value.
 
 ## 21. A gate calibrated at the one orientation that could not show the problem
 
@@ -371,7 +372,7 @@ of view.
 Number 17 fixed the scheduler so its chain survives a recovery: the ratio does not
 enter a blind stretch once, it chatters across the threshold, and a rule that
 re-arms its falling edge on every recovery pays for each crossing with a marker. The
-ROS wrapper did not call the scheduler. `detector.py` carried its own rule, a copy of
+ROS wrapper did not call the scheduler. The detector carried its own rule, a copy of
 the scheduler as it stood before that fix, with a 5.5 m spacing of its own that zeroed
 whenever a scan came back above the threshold.
 
@@ -382,11 +383,11 @@ markers were shorter than the rule's own 5.5 m spacing**. The M10 demonstration 
 stretches sat clearly below stopped the crossings and seed 2's markers fell from 58
 to 40 while detecting more.
 
-The wrapper now calls `locrec.policies.LocalizabilityScheduler` itself, with the
-calibrated spacing from `locrec/results/thresholds.json` and no default, so there is no
-second copy of the rule to go stale. `locrec_ros/test/test_markers_loop.py` pins
-it: 30 m of tunnel that chatters every 2 m buys markers at 0, 12.5 and 25 m, and on
-400 random scans the wrapper decides exactly what the scheduler decides.
+The node now calls the scheduler itself, with the calibrated spacing from
+`locrec/results/thresholds.json` and no default, so there is no second copy of the rule to go
+stale. `locrec_core/test/test_policies.cpp` pins it: 50 m of blind tunnel buys markers at the
+falling edge and then every 12.5 m, and a stretch that chatters across the threshold buys one,
+not one per crossing.
 
 ## 24. An estimator that would have discarded every marker without a word
 
